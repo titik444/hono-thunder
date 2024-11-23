@@ -1,8 +1,8 @@
-# Post API Spec
+# Bookmark API Spec
 
-## List Post by Room Slug
+## List Bookmark
 
-Endpoint : GET /api/room/{slug}/post
+Endpoint : GET /api/bookmark
 
 Response Body :
 
@@ -10,7 +10,7 @@ Response Body :
 {
   "status": true,
   "statusCode": 200,
-  "message": "Get list post success",
+  "message": "Get list bookmark success",
   "data": [
     {
       "id": 1,
@@ -67,23 +67,13 @@ Response Body :
 }
 ```
 
-## Create Post
+## Create Bookmark
 
-Endpoint : POST /api/room/{slug}/post
+Endpoint : POST /api/bookmark/{postId}
 
 Request Header :
 
 - Authorization : token
-- Content-Type: `multipart/form-data`
-
-Request Body :
-
-```json
-{
-  "content": "Post Pertama",
-  "image": (file: gambar.jpg)
-}
-```
 
 Response Body :
 
@@ -91,7 +81,7 @@ Response Body :
 {
   "status": true,
   "statusCode": 200,
-  "message": "Create post success",
+  "message": "Create bookmark success",
   "data": {
     "id": 1,
     "slug": "post-pertama",
@@ -119,63 +109,9 @@ Response Body :
 }
 ```
 
-## Update Post
+## Delete Bookmark
 
-Endpoint : PUT /api/post/{postId}
-
-Request Header :
-
-- Authorization : token
-- Content-Type: `multipart/form-data`
-
-Request Body :
-
-- content: (string, required)
-- image: (file, optional)
-
-```json
-{
-  "content": "Post Pertama",
-  "image": (file: gambar.jpg)
-}
-```
-
-Response Body :
-
-```json
-{
-  "status": true,
-  "statusCode": 200,
-  "message": "Update post success",
-  "data": {
-    "id": 1,
-    "user": {
-      "id": 1,
-      "username": "bob",
-      "email": "john.doe@gmail.com",
-      "name": "Bob Brown",
-      "profilePicture": "https://titik.my.id/images/2024/11/11/1731324664026.jpg",
-      "role": "User"
-    },
-    "room": {
-      "id": 15,
-      "name": "Madhouse",
-      "slug": "madhouse",
-      "parentId": 5,
-      "type": "Studio",
-      "category": "Film"
-    },
-    "content": "Post Pertama",
-    "image": "https://titik.my.id/images/2024/11/11/1731324664026.jpg",
-    "commentCount": 0,
-    "likeCount": 0
-  }
-}
-```
-
-## Delete Post
-
-Endpoint : DELETE /api/post/{postId}
+Endpoint : DELETE /api/bookmark/{postId}
 
 Request Header :
 
@@ -187,7 +123,7 @@ Response Body (Success):
 {
   "status": true,
   "statusCode": 200,
-  "message": "Delete post success",
+  "message": "Delete bookmark success",
   "data": true
 }
 ```

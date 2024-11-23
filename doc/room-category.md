@@ -1,8 +1,8 @@
 # Category API Spec
 
-## List Room Category (Admin Only)
+## List Room Category
 
-Endpoint : GET /api/room-category
+Endpoint : GET /api/room-category (Admin Only)
 
 Request Header :
 
@@ -42,9 +42,9 @@ Response Body :
 }
 ```
 
-## Create Room Category (Admin Only)
+## Create Room Category
 
-Endpoint : POST /api/room-category
+Endpoint : POST /api/room-category (Admin Only)
 
 Request Header :
 

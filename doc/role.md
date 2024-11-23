@@ -1,8 +1,8 @@
 # Role API Spec
 
-## List Role (Admin Only)
+## List Role
 
-Endpoint : GET /api/role
+Endpoint : GET /api/role (Admin Only)
 
 Request Header :
 
@@ -28,9 +28,9 @@ Response Body :
 }
 ```
 
-## Create Role (Admin Only)
+## Create Role
 
-Endpoint : POST /api/role
+Endpoint : POST /api/role (Admin Only)
 
 Request Header :
 

@@ -33,9 +33,9 @@ Response Body (Failed) :
 }
 ```
 
-## List User (Admin Only)
+## List User
 
-Endpoint : GET /api/user
+Endpoint : GET /api/user (Admin Only)
 
 Request Header :
 
@@ -96,7 +96,7 @@ Request Body :
   "username": "bob",
   "name": "Bob Brown",
   "password": "rahasia123",
-  "profile_picture": (file: avatar.jpg)
+  "profilePicture": (file: avatar.jpg)
 }
 ```
 
@@ -118,9 +118,9 @@ Response Body :
 }
 ```
 
-## Delete User (Admin Only)
+## Delete User
 
-Endpoint : DELETE /api/user/{user_id}
+Endpoint : DELETE /api/user/{userId} (Admin Only)
 
 Request Header :
 

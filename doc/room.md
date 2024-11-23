@@ -142,77 +142,13 @@ Response Body :
 }
 ```
 
-## List POST by Room Slug
-
-Endpoint : GET /api/room/{slug}/post
-
-Response Body :
-
-```json
-{
-  "status": true,
-  "statusCode": 200,
-  "message": "Get list post success",
-  "data": [
-    {
-      "id": 1,
-      "slug": "post-pertama",
-      "user": {
-        "id": 1,
-        "username": "bob",
-        "email": "john.doe@gmail.com",
-        "name": "Bob Brown",
-        "profilePicture": "https://titik.my.id/images/2024/11/11/1731324664026.jpg",
-        "role": "User"
-      },
-      "room": {
-        "id": 15,
-        "name": "Madhouse",
-        "slug": "madhouse",
-        "parentId": 5,
-        "type": "Studio",
-        "category": "Film"
-      },
-      "content": "Post Pertama",
-      "commentCount": 3,
-      "likeCount": 5
-    },
-    {
-      "id": 2,
-      "slug": "post-kedua",
-      "user": {
-        "id": 1,
-        "username": "bob",
-        "email": "john.doe@gmail.com",
-        "name": "Bob Brown",
-        "profilePicture": "https://titik.my.id/images/2024/11/11/1731324664026.jpg",
-        "role": "User"
-      },
-      "room": {
-        "id": 15,
-        "name": "Madhouse",
-        "slug": "madhouse",
-        "parentId": 5,
-        "type": "Studio",
-        "category": "Film"
-      },
-      "content": "Post Kedua",
-      "commentCount": 3,
-      "likeCount": 5
-    }
-  ],
-  "pagination": {
-    "currentPage": 1,
-    "perPage": 10,
-    "totalPages": 5,
-    "totalItems": 50
-  }
-}
-```
-
 ## List Room
 
 Endpoint : GET /api/room (Admin Only)
+
+Request Header :
+
+- Authorization : token
 
 Response Body :
 
@@ -226,7 +162,7 @@ Response Body :
       "id": 1,
       "name": "Universal Room",
       "slug": "universal-room",
-      "parent_id": null,
+      "parentId": null,
       "type": null,
       "category": "General"
     },
@@ -234,7 +170,7 @@ Response Body :
       "id": 4,
       "name": "Film Room",
       "slug": "film-room",
-      "parent_id": 1,
+      "parentId": 1,
       "type": null,
       "category": "Entertainment"
     },
@@ -242,7 +178,7 @@ Response Body :
       "id": 5,
       "name": "Anime Room",
       "slug": "anime-room",
-      "parent_id": 4,
+      "parentId": 4,
       "type": null,
       "category": "Film"
     },
@@ -250,7 +186,7 @@ Response Body :
       "id": 9,
       "name": "Anime Indonesia Room",
       "slug": "anime-indonesia-room",
-      "parent_id": 5,
+      "parentId": 5,
       "type": "Region",
       "category": "Film"
     },
@@ -258,7 +194,7 @@ Response Body :
       "id": 11,
       "name": "Anime Action",
       "slug": "anime-action",
-      "parent_id": 5,
+      "parentId": 5,
       "type": "Genre",
       "category": "Film"
     },
@@ -266,7 +202,7 @@ Response Body :
       "id": 14,
       "name": "Ghibli",
       "slug": "ghibli",
-      "parent_id": 5,
+      "parentId": 5,
       "type": "Studio",
       "category": "Film"
     }
@@ -353,7 +289,7 @@ Response Body :
 
 ## Delete Room
 
-Endpoint : DELETE /api/room/{room_id} (Admin Only)
+Endpoint : DELETE /api/room/{roomId} (Admin Only)
 
 Request Header :
 

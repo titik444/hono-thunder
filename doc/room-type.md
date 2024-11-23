@@ -1,8 +1,8 @@
 # Room Type API Spec
 
-## List Room Type (Admin Only)
+## List Room Type
 
-Endpoint : GET /api/room-type
+Endpoint : GET /api/room-type (Admin Only)
 
 Request Header :
 
@@ -42,9 +42,9 @@ Response Body :
 }
 ```
 
-## Create Room Type (Admin Only)
+## Create Room Type
 
-Endpoint : POST /api/room-type
+Endpoint : POST /api/room-type (Admin Only)
 
 Request Header :
 

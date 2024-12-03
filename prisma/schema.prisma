@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ApiKeys {
+  id      Int    @id @default(autoincrement())
+  api_key String @unique
+
+  @@map("api_keys")
+}
+
+model Role {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  users      User[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("role")
+}
+
+model User {
+  id              Int        @id @default(autoincrement())
+  username        String     @unique
+  email           String     @unique
+  password        String
+  name            String
+  profile_picture String?
+  role_id         Int
+  role            Role       @relation(fields: [role_id], references: [id])
+  posts           Post[]
+  comments        Comment[]
+  Like            Like[]
+  created_at      DateTime   @default(now())
+  updated_at      DateTime   @updatedAt
+  Bookmark        Bookmark[]
+
+  @@map("user")
+}
+
+model RoomCategory {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  rooms      Room[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("room_category")
+}
+
+model Room {
+  id          Int          @id @default(autoincrement())
+  name        String
+  slug        String       @unique
+  parent_id   Int?
+  parent      Room?        @relation("RoomHierarchy", fields: [parent_id], references: [id])
+  children    Room[]       @relation("RoomHierarchy")
+  category_id Int
+  category    RoomCategory @relation(fields: [category_id], references: [id])
+  posts       Post[]
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  @@map("room")
+}
+
+model Post {
+  id         Int        @id @default(autoincrement())
+  content    String
+  image      String?
+  user_id    Int
+  user       User       @relation(fields: [user_id], references: [id])
+  room_id    Int
+  room       Room       @relation(fields: [room_id], references: [id])
+  comments   Comment[]
+  Like       Like[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  Bookmark   Bookmark[]
+
+  @@map("post")
+}
+
+model Comment {
+  id         Int       @id @default(autoincrement())
+  content    String
+  post_id    Int
+  post       Post      @relation(fields: [post_id], references: [id])
+  user_id    Int
+  user       User      @relation(fields: [user_id], references: [id])
+  parent_id  Int?
+  parent     Comment?  @relation("CommentHierarchy", fields: [parent_id], references: [id])
+  replies    Comment[] @relation("CommentHierarchy")
+  Like       Like[]
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  @@map("comment")
+}
+
+model Like {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  user       User     @relation(fields: [user_id], references: [id])
+  post_id    Int?
+  post       Post?    @relation(fields: [post_id], references: [id])
+  comment_id Int?
+  comment    Comment? @relation(fields: [comment_id], references: [id])
+  created_at DateTime @default(now())
+
+  @@unique([user_id, post_id])
+  @@unique([user_id, comment_id])
+  @@map("like")
+}
+
+model Bookmark {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  user       User     @relation(fields: [user_id], references: [id])
+  post_id    Int
+  post       Post     @relation(fields: [post_id], references: [id])
+  created_at DateTime @default(now())
+
+  @@unique([user_id, post_id])
+  @@map("bookmark")
+}

@@ -83,12 +83,11 @@ Request Body :
 ```json
 {
   "content": "Comment Kedua",
-  "parrentId": 1,
-  "replyToUsername": "alice"
+  "parentId": 1
 }
 ```
 
-Response Body :
+Response Body (Success):
 
 ```json
 {
@@ -109,15 +108,18 @@ Response Body :
     "parentId": 1,
     "content": "Comment Kedua",
     "likeCount": 10,
-    "replyToUser": {
-      "id": 2,
-      "username": "alice",
-      "email": "alice.smith@gmail.com",
-      "name": "Alice Smith",
-      "profilePicture": "https://titik.my.id/images/2024/11/11/1731324664026.jpg",
-      "role": "User"
-    }
+    "replyToUser": "alice"
   }
+}
+```
+
+Response Body (Failed):
+
+```json
+{
+  "status": false,
+  "statusCode": 404,
+  "message": "Post not found"
 }
 ```
 

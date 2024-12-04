@@ -3,6 +3,7 @@ import { prisma } from './utils/prisma'
 import { authController } from './controller/auth.controller'
 import { roomController } from './controller/room.controller'
 import { postController } from './controller/post.controller'
+import { commentController } from './controller/comment.controller'
 
 export const routes = (app: Hono) => {
   app.get('/health', async (c) => {
@@ -21,4 +22,5 @@ export const routes = (app: Hono) => {
   app.route('/api', authController)
   app.route('/api', roomController)
   app.route('/api', postController)
+  app.route('/api', commentController)
 }

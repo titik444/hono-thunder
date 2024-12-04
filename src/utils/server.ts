@@ -4,7 +4,7 @@ import { serveStatic } from 'hono/bun'
 import { ZodError } from 'zod'
 import { logger } from './logging'
 import { routes } from '../routes'
-import { apiKeyAuth } from '../middleware/apiKey.middleware'
+import { apiKeyAuth } from '../middleware/api-key.middleware'
 
 const createServer = () => {
   const app = new Hono()
@@ -12,8 +12,11 @@ const createServer = () => {
   // Serve static files
   app.use('*', serveStatic({ root: './public' }))
 
-  // Middleware API key, kecualikan /auth/generate-api-key
-  app.use(apiKeyAuth(['/api/health', '/api/generate-api-key']) as any)
+  // use API key if production
+  if (process.env.NODE_ENV === 'production') {
+    // Middleware API key, kecualikan /auth/generate-api-key
+    app.use(apiKeyAuth(['/api/health', '/api/generate-api-key']) as any)
+  }
 
   // Setup routes
   routes(app)

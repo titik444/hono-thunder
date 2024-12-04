@@ -44,7 +44,7 @@ export function toPostResponse(post: PostWithRelations): PostResponse {
       username: post.user.username,
       email: post.user.email,
       name: post.user.name,
-      profilePicture: post.user.profile_picture || null,
+      profilePicture: post.user.profile_picture ? `${process.env.BASE_URL}/${post.user.profile_picture}` : null,
       role: post.user.role.name
     },
     room: {

@@ -80,7 +80,7 @@ Response Body (Success) :
 
 Response Body (Failed) :
 
-````json
+```json
 {
   "status": false,
   "statusCode": 401,
@@ -112,7 +112,7 @@ Response Body (Success):
     "role": "User"
   }
 }
-````
+```
 
 Response Body (Failed) :
 

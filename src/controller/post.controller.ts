@@ -6,7 +6,6 @@ import { response } from '../utils/response'
 import { ListPostRequest, CreatePostRequest } from '../model/post.model'
 import { PostService } from '../service/post.service'
 import { uploadMiddleware } from '../middleware/upload.middleware'
-import * as path from 'path'
 
 export const postController = new Hono<{ Variables: ApplicationVariables }>()
 
@@ -17,9 +16,9 @@ postController.get('/room/:slug/post', async (c) => {
     per_page: Number(c.req.query('per_page')) || 10
   }
 
-  const posts = await PostService.list(request)
+  const postResponse = await PostService.list(request)
 
-  return response(c, 200, 'List post success', posts)
+  return response(c, 200, 'List post success', postResponse)
 })
 
 postController.post(

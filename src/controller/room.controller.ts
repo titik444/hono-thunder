@@ -8,5 +8,7 @@ export const roomController = new Hono<{ Variables: ApplicationVariables }>()
 roomController.get('/room', async (c) => {
   const rooms = await RoomService.list()
 
-  return response(c, 200, 'List room success', rooms)
+  return response(c, 200, 'List room success', {
+    ...rooms
+  })
 })

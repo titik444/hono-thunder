@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs'
-import * as crypto from 'crypto'
+import { nanoid } from 'nanoid'
 import { Context } from 'hono'
 import moment from 'moment'
 import { HTTPException } from 'hono/http-exception'
@@ -47,7 +47,7 @@ export const uploadMiddleware = (options: UploadOptions) => {
     fs.mkdirSync(folderPath, { recursive: true })
 
     // Tentukan nama file unik
-    const filename = crypto.randomBytes(16).toString('hex') + fileExtension
+    const filename = nanoid(16) + fileExtension
     const filePath = path.join(folderPath, filename)
 
     // Simpan file ke disk

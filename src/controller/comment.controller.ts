@@ -30,3 +30,11 @@ commentController.post('/post/:postId/comment', authMiddleware, async (c) => {
 
   return response(c, 201, 'Create comment success', commentResponse)
 })
+
+commentController.get('/comment/:commentId', async (c) => {
+  const commentId = Number(c.req.param('commentId'))
+
+  const commentResponse = await CommentService.get(commentId)
+
+  return response(c, 200, 'Detail comment success', commentResponse)
+})

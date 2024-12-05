@@ -2,11 +2,9 @@ import { Bookmark, Post, Role, Room, RoomCategory, User } from '@prisma/client'
 
 export type CreateBookmarkRequest = {
   post_id: number
-  user_id: number
 }
 
 export type ListBookmarkRequest = {
-  user_id: number
   page: number
   per_page: number
 }

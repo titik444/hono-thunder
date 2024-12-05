@@ -69,7 +69,7 @@ Response Body :
 
 ## Create Bookmark
 
-Endpoint : POST /api/bookmark/{postId}
+Endpoint : POST /api/post/{postId}/bookmark
 
 Request Header :
 
@@ -111,7 +111,7 @@ Response Body :
 
 ## Delete Bookmark
 
-Endpoint : DELETE /api/bookmark/{postId}
+Endpoint : DELETE /api/bookmark/{bookmarkId}
 
 Request Header :
 

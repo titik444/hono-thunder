@@ -88,6 +88,29 @@ export class CommentService {
     }
   }
 
+  static async get(commentId: number): Promise<CommentResponse> {
+    commentId = CommentValidation.GET.parse(commentId)
+
+    const comment = await prisma.comment.findFirst({
+      where: { id: commentId },
+      include: {
+        user: {
+          include: {
+            role: true
+          }
+        }
+      }
+    })
+
+    if (!comment) {
+      throw new HTTPException(404, {
+        message: 'Comment not found'
+      })
+    }
+
+    return toCommentResponse(comment)
+  }
+
   static async postMustExists(postId: number): Promise<Post> {
     const post = await prisma.post.findFirst({
       where: { id: postId }

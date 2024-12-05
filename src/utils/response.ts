@@ -9,13 +9,30 @@ export const response = (
 ) => {
   c.status(status)
 
-  // Pastikan `data` selalu terdefinisi
-  const responseData = typeof data === 'object' ? { ...data } : { data }
+  if (typeof data === 'boolean') {
+    return c.json({
+      status: data,
+      statusCode: status,
+      message: message,
+      data: data
+    })
+  }
+
+  if (typeof data === 'object' && 'data' in data) {
+    const dataObject = data as { data: {} }
+
+    return c.json({
+      status: true,
+      statusCode: status,
+      message: message,
+      ...dataObject
+    })
+  }
 
   return c.json({
     status: true,
     statusCode: status,
     message: message,
-    ...responseData
+    data
   })
 }

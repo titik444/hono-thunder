@@ -7,20 +7,20 @@ import {
 } from '../model/bookmark.model'
 import { prisma } from '../utils/prisma'
 import { BookmarkValidation } from '../validation/bookmark.validation'
-import { Post } from '@prisma/client'
+import { Post, User } from '@prisma/client'
 import { Pageable } from '../model/page.model'
 
 export class BookmarkService {
-  static async create(request: CreateBookmarkRequest): Promise<boolean> {
+  static async create(user: User, request: CreateBookmarkRequest): Promise<boolean> {
+    request = BookmarkValidation.CREATE.parse(request)
+
+    await this.postMustExists(request.post_id)
+
     try {
-      request = BookmarkValidation.CREATE.parse(request)
-
-      await this.postMustExists(request.post_id)
-
       await prisma.bookmark.create({
         data: {
           post_id: request.post_id,
-          user_id: request.user_id
+          user_id: user.id
         }
       })
 
@@ -32,14 +32,14 @@ export class BookmarkService {
     }
   }
 
-  static async list(request: ListBookmarkRequest): Promise<Pageable<ListBookmarkResponse>> {
+  static async list(user: User, request: ListBookmarkRequest): Promise<Pageable<ListBookmarkResponse>> {
     request = BookmarkValidation.LIST.parse(request)
 
     const skip = (request.page - 1) * request.per_page
 
     const bookmarks = await prisma.bookmark.findMany({
       where: {
-        user_id: request.user_id
+        user_id: user.id
       },
       include: {
         post: {
@@ -63,7 +63,7 @@ export class BookmarkService {
 
     const total = await prisma.bookmark.count({
       where: {
-        user_id: request.user_id
+        user_id: user.id
       }
     })
 
@@ -76,6 +76,19 @@ export class BookmarkService {
         totalItems: total
       }
     }
+  }
+
+  static async delete(user: User, postId: number): Promise<boolean> {
+    postId = BookmarkValidation.REMOVE.parse(postId)
+
+    await prisma.bookmark.deleteMany({
+      where: {
+        post_id: postId,
+        user_id: user.id
+      }
+    })
+
+    return true
   }
 
   static async postMustExists(postId: number): Promise<Post> {

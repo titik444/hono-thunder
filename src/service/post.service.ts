@@ -1,5 +1,7 @@
-import { Room, User } from '@prisma/client'
+import fs from 'fs'
 import { prisma } from '../utils/prisma'
+import { Room, User } from '@prisma/client'
+import { HTTPException } from 'hono/http-exception'
 import { PostValidation } from '../validation/post.validation'
 import {
   CreatePostRequest,
@@ -10,7 +12,6 @@ import {
   toPostResponse,
   UpdatePostRequest
 } from '../model/post.model'
-import { HTTPException } from 'hono/http-exception'
 import { Pageable } from '../model/page.model'
 
 export class PostService {
@@ -24,7 +25,7 @@ export class PostService {
     const post = await prisma.post.create({
       data: {
         content: request.content,
-        image: request.image || null, // Save image path if exists
+        image: request.image || null,
         room_id: room.id,
         user_id: user.id
       },
@@ -87,7 +88,7 @@ export class PostService {
     })
 
     return {
-      data: posts.map((post) => toPostResponse(post)),
+      data: await Promise.all(posts.map((post) => toPostResponse(post))),
       pagination: {
         currentPage: request.page,
         perPage: request.per_page,
@@ -158,6 +159,14 @@ export class PostService {
       throw new HTTPException(403, {
         message: 'You are not authorized to update this post'
       })
+    }
+
+    // Hapus gambar lama jika ada gambar baru
+    if (request.image && post.image) {
+      const oldImagePath = `public/${post.image}`
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath) // Hapus file gambar lama
+      }
     }
 
     const updatedPost = await prisma.post.update({

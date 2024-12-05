@@ -1,4 +1,5 @@
 import { Post, Role, Room, RoomCategory, User } from '@prisma/client'
+import { prisma } from '../utils/prisma'
 
 export type CreatePostRequest = {
   content: string
@@ -41,6 +42,7 @@ export type PostResponse = {
     slug: string
     category: string
   }
+  likeCount: number
 }
 
 export type ListPostRequest = {
@@ -49,9 +51,18 @@ export type ListPostRequest = {
   per_page: number
 }
 
-export type PostWithRelations = Post & { user: User & { role: Role } } & { room: Room & { category: RoomCategory } }
+export type PostWithRelations = Post & { user: User & { role: Role } } & { room: Room & { category: RoomCategory } } & {
+  likeCount?: number
+}
 
-export function toPostResponse(post: PostWithRelations): PostResponse {
+export async function toPostResponse(post: PostWithRelations): Promise<PostResponse> {
+  // likeCount
+  const likeCount = await prisma.like.count({
+    where: {
+      post_id: post.id
+    }
+  })
+
   return {
     id: post.id,
     content: post.content,
@@ -69,6 +80,7 @@ export function toPostResponse(post: PostWithRelations): PostResponse {
       name: post.room.name,
       slug: post.room.slug,
       category: post.room.category.name
-    }
+    },
+    likeCount: likeCount
   }
 }

@@ -5,7 +5,7 @@
     "seed": "bun prisma/seeders/seed.ts",
     "format": "prettier --write .",
     "build": "bun build src/index.ts --outdir dist --sourcemap --minify",
-    "commit": "prettier --write . && bun build src/index.ts --outdir dist --sourcemap --minify && git add ."
+    "commit": "bun update && prettier --write . && bun build src/index.ts --outdir dist --sourcemap --minify && git add ."
   },
   "dependencies": {
     "@prisma/client": "^6.0.1",

@@ -42,6 +42,7 @@ export type CommentResponse = {
     role: string
   }
   replyToUser?: string | null
+  likeCount: number
 }
 
 export type CommentWithRepliesResponse = {
@@ -58,14 +59,21 @@ export type CommentWithRepliesResponse = {
   }
   parentId?: number | null
   replies: CommentResponse[]
+  likeCount: number
 }
 
 export type CommentWithReplies = Comment & {
   user: User & { role: Role }
   replies?: CommentWithReplies[] | null
-}
+} & { likeCount?: number }
 
 export async function toCommentWithRepliesResponse(comment: CommentWithReplies): Promise<CommentWithRepliesResponse> {
+  const likeCount = await prisma.like.count({
+    where: {
+      comment_id: comment.id
+    }
+  })
+
   return {
     id: comment.id,
     postId: comment.post_id,
@@ -79,11 +87,18 @@ export async function toCommentWithRepliesResponse(comment: CommentWithReplies):
       role: comment.user.role.name
     },
     parentId: comment.parent_id,
-    replies: comment.replies ? await Promise.all(comment.replies.map((reply) => toCommentResponse(reply))) : []
+    replies: comment.replies ? await Promise.all(comment.replies.map((reply) => toCommentResponse(reply))) : [],
+    likeCount: likeCount
   }
 }
 
 export async function toCommentResponse(comment: Comment & { user: User & { role: Role } }): Promise<CommentResponse> {
+  const likeCount = await prisma.like.count({
+    where: {
+      comment_id: comment.id
+    }
+  })
+
   const replyToUser = comment.parent_id
     ? await prisma.comment
         .findUnique({
@@ -111,6 +126,7 @@ export async function toCommentResponse(comment: Comment & { user: User & { role
       profilePicture: comment.user.profile_picture ? `${process.env.BASE_URL}/${comment.user.profile_picture}` : null,
       role: comment.user.role.name
     },
-    replyToUser
+    replyToUser,
+    likeCount: likeCount
   }
 }

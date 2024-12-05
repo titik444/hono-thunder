@@ -7,7 +7,16 @@ export class CommentValidation {
     parent_id: z.number().positive().optional()
   })
 
-  static readonly GET: ZodType = z.number().positive()
+  static readonly GET: ZodType = z.object({
+    post_id: z.number().positive(),
+    id: z.number().positive()
+  })
+
+  static readonly UPDATE: ZodType = z.object({
+    id: z.number().positive(),
+    content: z.string().min(1),
+    post_id: z.number().positive()
+  })
 
   static readonly LIST: ZodType = z.object({
     post_id: z.number().positive(),

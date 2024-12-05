@@ -13,6 +13,17 @@ export type ListCommentRequest = {
   per_page: number
 }
 
+export type GetCommentRequest = {
+  post_id: number
+  id: number
+}
+
+export type UpdateCommentRequest = {
+  post_id: number
+  id: number
+  content: string
+}
+
 export type CommentResponse = {
   id: number
   postId: number

@@ -3,7 +3,7 @@ import { User } from '@prisma/client'
 import { ApplicationVariables } from '../model/app.model'
 import { authMiddleware } from '../middleware/auth.middleware'
 import { response } from '../utils/response'
-import { ListPostRequest, CreatePostRequest } from '../model/post.model'
+import { ListPostRequest, CreatePostRequest, GetPostRequest, UpdatePostRequest } from '../model/post.model'
 import { PostService } from '../service/post.service'
 import { uploadMiddleware } from '../middleware/upload.middleware'
 
@@ -49,5 +49,44 @@ postController.post(
     const postResponse = await PostService.create(user, request)
 
     return response(c, 201, 'Create post success', postResponse)
+  }
+)
+
+postController.get('/room/:slug/post/:postId', async (c) => {
+  const slug = String(c.req.param('slug'))
+  const postId = Number(c.req.param('postId'))
+
+  const request: GetPostRequest = {
+    slug,
+    id: postId
+  }
+
+  const postResponse = await PostService.get(request)
+
+  return response(c, 200, 'Get post success', postResponse)
+})
+
+postController.put(
+  '/room/:slug/post/:postId',
+  authMiddleware,
+  uploadMiddleware({ uploadDir: 'post', fileFieldName: 'image' }),
+  async (c) => {
+    const user = c.get('user') as User
+    const slug = String(c.req.param('slug'))
+    const postId = Number(c.req.param('postId'))
+
+    const formData = await c.req.formData()
+    const content = formData.get('content')?.toString() || ''
+
+    const request: UpdatePostRequest = {
+      slug,
+      content,
+      id: postId,
+      image: c.get('uploadedFilePath') as unknown as string
+    }
+
+    const postResponse = await PostService.update(user, request)
+
+    return response(c, 200, 'Update post success', postResponse)
   }
 )

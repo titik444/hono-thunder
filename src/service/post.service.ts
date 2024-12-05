@@ -1,7 +1,14 @@
 import { Room, User } from '@prisma/client'
 import { prisma } from '../utils/prisma'
 import { PostValidation } from '../validation/post.validation'
-import { CreatePostRequest, ListPostRequest, PostResponse, toPostResponse } from '../model/post.model'
+import {
+  CreatePostRequest,
+  GetPostRequest,
+  ListPostRequest,
+  PostResponse,
+  toPostResponse,
+  UpdatePostRequest
+} from '../model/post.model'
 import { HTTPException } from 'hono/http-exception'
 import { Pageable } from '../model/page.model'
 
@@ -86,6 +93,94 @@ export class PostService {
         totalItems: total
       }
     }
+  }
+
+  static async get(request: GetPostRequest): Promise<PostResponse> {
+    request = PostValidation.GET.parse(request)
+
+    const room = await this.roomMustExists(request.slug) // Validasi room
+
+    const post = await prisma.post.findFirst({
+      where: { id: request.id, room_id: room.id },
+      include: {
+        user: {
+          include: {
+            role: true
+          }
+        },
+        room: {
+          include: {
+            category: true
+          }
+        }
+      }
+    })
+
+    if (!post) {
+      throw new HTTPException(404, {
+        message: 'Post not found'
+      })
+    }
+
+    return toPostResponse(post)
+  }
+
+  static async update(user: User, request: UpdatePostRequest): Promise<PostResponse> {
+    request = PostValidation.UPDATE.parse(request)
+
+    const room = await this.roomMustExists(request.slug) // Validasi room
+
+    const post = await prisma.post.findFirst({
+      where: { id: request.id, room_id: room.id },
+      include: {
+        user: {
+          include: {
+            role: true
+          }
+        },
+        room: {
+          include: {
+            category: true
+          }
+        }
+      }
+    })
+
+    if (!post) {
+      throw new HTTPException(404, {
+        message: 'Post not found'
+      })
+    }
+
+    if (post.user_id !== user.id) {
+      throw new HTTPException(403, {
+        message: 'You are not authorized to update this post'
+      })
+    }
+
+    const updatedPost = await prisma.post.update({
+      where: {
+        id: request.id
+      },
+      data: {
+        content: request.content,
+        image: request.image || post.image // Save image path if exists
+      },
+      include: {
+        user: {
+          include: {
+            role: true
+          }
+        },
+        room: {
+          include: {
+            category: true
+          }
+        }
+      }
+    })
+
+    return toPostResponse(updatedPost)
   }
 
   static async roomMustExists(slug: string): Promise<Room> {

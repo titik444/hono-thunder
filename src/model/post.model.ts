@@ -6,6 +6,18 @@ export type CreatePostRequest = {
   image?: string
 }
 
+export type GetPostRequest = {
+  slug: string
+  id: number
+}
+
+export type UpdatePostRequest = {
+  slug: string
+  id: number
+  content: string
+  image?: string
+}
+
 export type PostResponse = {
   id: number
   content: string

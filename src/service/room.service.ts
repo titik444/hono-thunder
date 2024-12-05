@@ -3,7 +3,7 @@ import { ListRoom, RoomResponse, toRoomResponse } from '../model/room.model'
 
 export class RoomService {
   // Fetch all rooms with their relationships
-  static async list(): Promise<RoomResponse[]> {
+  static async listWithChildren(): Promise<RoomResponse[]> {
     const rooms = await prisma.room.findMany({
       include: { children: true, category: true }
     })

@@ -7,6 +7,18 @@ export class PostValidation {
     image: z.string().min(1).optional()
   })
 
+  static readonly GET: ZodType = z.object({
+    slug: z.string().min(1),
+    id: z.number().positive()
+  })
+
+  static readonly UPDATE: ZodType = z.object({
+    slug: z.string().min(1),
+    id: z.number().positive(),
+    content: z.string().min(1),
+    image: z.string().min(1).optional()
+  })
+
   static readonly LIST: ZodType = z.object({
     slug: z.string().min(1),
     page: z.number().min(1).positive(),

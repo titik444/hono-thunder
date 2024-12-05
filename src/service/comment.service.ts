@@ -3,9 +3,11 @@ import {
   CommentResponse,
   CommentWithRepliesResponse,
   CreateCommentRequest,
+  GetCommentRequest,
   ListCommentRequest,
   toCommentResponse,
-  toCommentWithRepliesResponse
+  toCommentWithRepliesResponse,
+  UpdateCommentRequest
 } from '../model/comment.model'
 import { HTTPException } from 'hono/http-exception'
 import { prisma } from '../utils/prisma'
@@ -88,11 +90,11 @@ export class CommentService {
     }
   }
 
-  static async get(commentId: number): Promise<CommentResponse> {
-    commentId = CommentValidation.GET.parse(commentId)
+  static async get(request: GetCommentRequest): Promise<CommentResponse> {
+    request = CommentValidation.GET.parse(request)
 
     const comment = await prisma.comment.findFirst({
-      where: { id: commentId },
+      where: { id: request.id, post_id: request.post_id },
       include: {
         user: {
           include: {
@@ -109,6 +111,43 @@ export class CommentService {
     }
 
     return toCommentResponse(comment)
+  }
+
+  static async update(user: User, request: UpdateCommentRequest): Promise<CommentResponse> {
+    request = CommentValidation.UPDATE.parse(request)
+
+    const comment = await prisma.comment.findFirst({
+      where: { id: request.id, post_id: request.post_id, user_id: user.id },
+      include: {
+        user: {
+          include: {
+            role: true
+          }
+        }
+      }
+    })
+
+    if (!comment) {
+      throw new HTTPException(404, {
+        message: 'Comment not found'
+      })
+    }
+
+    const updatedComment = await prisma.comment.update({
+      where: { id: comment.id },
+      data: {
+        content: request.content
+      },
+      include: {
+        user: {
+          include: {
+            role: true
+          }
+        }
+      }
+    })
+
+    return toCommentResponse(updatedComment)
   }
 
   static async postMustExists(postId: number): Promise<Post> {

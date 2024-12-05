@@ -15,7 +15,7 @@ const createServer = () => {
   // use API key if production
   if (process.env.NODE_ENV === 'production') {
     // Middleware API key, kecualikan /auth/generate-api-key
-    app.use(apiKeyAuth(['/api/health', '/api/generate-api-key']) as any)
+    app.use(apiKeyAuth(['/health', '/api/generate-api-key']) as any)
   }
 
   // Setup routes

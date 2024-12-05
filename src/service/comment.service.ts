@@ -5,6 +5,7 @@ import {
   CreateCommentRequest,
   GetCommentRequest,
   ListCommentRequest,
+  RemoveCommentRequest,
   toCommentResponse,
   toCommentWithRepliesResponse,
   UpdateCommentRequest
@@ -51,7 +52,8 @@ export class CommentService {
     const comments = await prisma.comment.findMany({
       where: {
         post_id: post.id,
-        parent_id: null
+        parent_id: null,
+        deleted: false
       },
       include: {
         user: {
@@ -60,6 +62,7 @@ export class CommentService {
           }
         },
         replies: {
+          where: { deleted: false },
           include: {
             user: {
               include: {
@@ -75,7 +78,9 @@ export class CommentService {
 
     const total = await prisma.comment.count({
       where: {
-        post_id: post.id
+        post_id: post.id,
+        parent_id: null,
+        deleted: false
       }
     })
 
@@ -94,7 +99,7 @@ export class CommentService {
     request = CommentValidation.GET.parse(request)
 
     const comment = await prisma.comment.findFirst({
-      where: { id: request.id, post_id: request.post_id },
+      where: { id: request.id, post_id: request.post_id, deleted: false },
       include: {
         user: {
           include: {
@@ -133,6 +138,12 @@ export class CommentService {
       })
     }
 
+    if (comment.user_id !== user.id) {
+      throw new HTTPException(403, {
+        message: 'You are not authorized to update this comment'
+      })
+    }
+
     const updatedComment = await prisma.comment.update({
       where: { id: comment.id },
       data: {
@@ -150,9 +161,46 @@ export class CommentService {
     return toCommentResponse(updatedComment)
   }
 
+  static async remove(user: User, request: RemoveCommentRequest): Promise<Boolean> {
+    request = CommentValidation.REMOVE.parse(request)
+
+    const comment = await prisma.comment.findFirst({
+      where: { id: request.id, post_id: request.post_id, user_id: user.id, deleted: false },
+      include: {
+        user: {
+          include: {
+            role: true
+          }
+        }
+      }
+    })
+
+    if (!comment) {
+      throw new HTTPException(404, {
+        message: 'Comment not found'
+      })
+    }
+
+    if (comment.user_id !== user.id) {
+      throw new HTTPException(403, {
+        message: 'You are not authorized to remove this comment'
+      })
+    }
+
+    // soft delete
+    await prisma.comment.update({
+      where: { id: comment.id },
+      data: {
+        deleted: true
+      }
+    })
+
+    return true
+  }
+
   static async postMustExists(postId: number): Promise<Post> {
     const post = await prisma.post.findFirst({
-      where: { id: postId }
+      where: { id: postId, deleted: false }
     })
 
     if (!post) {

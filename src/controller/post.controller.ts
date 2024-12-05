@@ -3,7 +3,13 @@ import { User } from '@prisma/client'
 import { ApplicationVariables } from '../model/app.model'
 import { authMiddleware } from '../middleware/auth.middleware'
 import { response } from '../utils/response'
-import { ListPostRequest, CreatePostRequest, GetPostRequest, UpdatePostRequest } from '../model/post.model'
+import {
+  ListPostRequest,
+  CreatePostRequest,
+  GetPostRequest,
+  UpdatePostRequest,
+  RemovePostRequest
+} from '../model/post.model'
 import { PostService } from '../service/post.service'
 import { uploadMiddleware } from '../middleware/upload.middleware'
 
@@ -90,3 +96,18 @@ postController.put(
     return response(c, 200, 'Update post success', postResponse)
   }
 )
+
+postController.delete('/room/:slug/post/:postId', authMiddleware, async (c) => {
+  const user = c.get('user') as User
+  const slug = String(c.req.param('slug'))
+  const postId = Number(c.req.param('postId'))
+
+  const request: RemovePostRequest = {
+    slug,
+    id: postId
+  }
+
+  const postResponse = await PostService.remove(user, request)
+
+  return response(c, 200, 'Remove post success', postResponse)
+})

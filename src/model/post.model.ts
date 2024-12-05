@@ -18,6 +18,11 @@ export type UpdatePostRequest = {
   image?: string
 }
 
+export type RemovePostRequest = {
+  slug: string
+  id: number
+}
+
 export type PostResponse = {
   id: number
   content: string

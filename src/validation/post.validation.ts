@@ -19,6 +19,11 @@ export class PostValidation {
     image: z.string().min(1).optional()
   })
 
+  static readonly REMOVE: ZodType = z.object({
+    slug: z.string().min(1),
+    id: z.number().positive()
+  })
+
   static readonly LIST: ZodType = z.object({
     slug: z.string().min(1),
     page: z.number().min(1).positive(),

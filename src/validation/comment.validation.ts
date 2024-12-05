@@ -18,6 +18,11 @@ export class CommentValidation {
     post_id: z.number().positive()
   })
 
+  static readonly REMOVE: ZodType = z.object({
+    post_id: z.number().positive(),
+    id: z.number().positive()
+  })
+
   static readonly LIST: ZodType = z.object({
     post_id: z.number().positive(),
     page: z.number().min(1).positive(),

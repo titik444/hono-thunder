@@ -24,6 +24,11 @@ export type UpdateCommentRequest = {
   content: string
 }
 
+export type RemoveCommentRequest = {
+  post_id: number
+  id: number
+}
+
 export type CommentResponse = {
   id: number
   postId: number
@@ -82,7 +87,7 @@ export async function toCommentResponse(comment: Comment & { user: User & { role
   const replyToUser = comment.parent_id
     ? await prisma.comment
         .findUnique({
-          where: { id: comment.parent_id },
+          where: { id: comment.parent_id, deleted: false },
           select: {
             user: {
               select: {

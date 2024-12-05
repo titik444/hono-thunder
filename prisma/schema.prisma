@@ -26,6 +26,7 @@ model Role {
   users      User[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  deleted    Boolean  @default(false)
 
   @@map("role")
 }
@@ -41,10 +42,12 @@ model User {
   role            Role       @relation(fields: [role_id], references: [id])
   posts           Post[]
   comments        Comment[]
+  mentioned_in    Comment[]  @relation("MentionedUser")
   Like            Like[]
+  Bookmark        Bookmark[]
   created_at      DateTime   @default(now())
   updated_at      DateTime   @updatedAt
-  Bookmark        Bookmark[]
+  deleted         Boolean    @default(false)
 
   @@map("user")
 }
@@ -71,6 +74,7 @@ model Room {
   posts       Post[]
   created_at  DateTime     @default(now())
   updated_at  DateTime     @updatedAt
+  deleted     Boolean      @default(false)
 
   @@map("room")
 }
@@ -85,26 +89,30 @@ model Post {
   room       Room       @relation(fields: [room_id], references: [id])
   comments   Comment[]
   Like       Like[]
+  Bookmark   Bookmark[]
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt
-  Bookmark   Bookmark[]
+  deleted    Boolean    @default(false)
 
   @@map("post")
 }
 
 model Comment {
-  id         Int       @id @default(autoincrement())
-  content    String
-  post_id    Int
-  post       Post      @relation(fields: [post_id], references: [id])
-  user_id    Int
-  user       User      @relation(fields: [user_id], references: [id])
-  parent_id  Int?
-  parent     Comment?  @relation("CommentHierarchy", fields: [parent_id], references: [id])
-  replies    Comment[] @relation("CommentHierarchy")
-  Like       Like[]
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  id                Int       @id @default(autoincrement())
+  content           String
+  post_id           Int
+  post              Post      @relation(fields: [post_id], references: [id])
+  user_id           Int
+  user              User      @relation(fields: [user_id], references: [id])
+  mentioned_user_id Int?
+  mentioned_user    User?     @relation("MentionedUser", fields: [mentioned_user_id], references: [id])
+  parent_id         Int?
+  parent            Comment?  @relation("CommentHierarchy", fields: [parent_id], references: [id])
+  replies           Comment[] @relation("CommentHierarchy")
+  Like              Like[]
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  deleted           Boolean   @default(false)
 
   @@map("comment")
 }

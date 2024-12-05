@@ -66,3 +66,18 @@ commentController.put('/post/:postId/comment/:commentId', authMiddleware, async 
 
   return response(c, 200, 'Update comment success', commentResponse)
 })
+
+commentController.delete('/post/:postId/comment/:commentId', authMiddleware, async (c) => {
+  const user = c.get('user') as User
+  const postId = Number(c.req.param('postId'))
+  const id = Number(c.req.param('commentId'))
+
+  const request: GetCommentRequest = {
+    post_id: postId,
+    id: id
+  }
+
+  const commentResponse = await CommentService.remove(user, request)
+
+  return response(c, 200, 'Remove comment success', commentResponse)
+})

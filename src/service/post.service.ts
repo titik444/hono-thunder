@@ -6,6 +6,7 @@ import {
   GetPostRequest,
   ListPostRequest,
   PostResponse,
+  RemovePostRequest,
   toPostResponse,
   UpdatePostRequest
 } from '../model/post.model'
@@ -58,7 +59,8 @@ export class PostService {
       where: {
         room: {
           id: room.id
-        }
+        },
+        deleted: false
       },
       include: {
         user: {
@@ -101,7 +103,7 @@ export class PostService {
     const room = await this.roomMustExists(request.slug) // Validasi room
 
     const post = await prisma.post.findFirst({
-      where: { id: request.id, room_id: room.id },
+      where: { id: request.id, room_id: room.id, deleted: false },
       include: {
         user: {
           include: {
@@ -183,10 +185,56 @@ export class PostService {
     return toPostResponse(updatedPost)
   }
 
+  static async remove(user: User, request: RemovePostRequest): Promise<Boolean> {
+    request = PostValidation.REMOVE.parse(request)
+
+    const room = await this.roomMustExists(request.slug) // Validasi room
+
+    const post = await prisma.post.findFirst({
+      where: { id: request.id, room_id: room.id, deleted: false },
+      include: {
+        user: {
+          include: {
+            role: true
+          }
+        },
+        room: {
+          include: {
+            category: true
+          }
+        }
+      }
+    })
+
+    if (!post) {
+      throw new HTTPException(404, {
+        message: 'Post not found'
+      })
+    }
+
+    if (post.user_id !== user.id) {
+      throw new HTTPException(403, {
+        message: 'You are not authorized to remove this post'
+      })
+    }
+
+    await prisma.post.update({
+      where: {
+        id: request.id
+      },
+      data: {
+        deleted: true
+      }
+    })
+
+    return true
+  }
+
   static async roomMustExists(slug: string): Promise<Room> {
     const room = await prisma.room.findFirst({
       where: {
-        slug: slug
+        slug: slug,
+        deleted: false
       }
     })
 

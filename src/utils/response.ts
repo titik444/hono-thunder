@@ -5,12 +5,12 @@ export const response = (
   },
   status = 200,
   message = 'Success',
-  data: {} | any[] = {}
+  data: boolean | {} | any[] = {}
 ) => {
   c.status(status)
 
   // Pastikan `data` selalu terdefinisi
-  const responseData = Array.isArray(data) || 'pagination' in data ? { ...data } : { data }
+  const responseData = typeof data === 'object' ? { ...data } : { data }
 
   return c.json({
     status: true,

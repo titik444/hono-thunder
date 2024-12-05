@@ -5,6 +5,7 @@ export type CreateCommentRequest = {
   content: string
   post_id: number
   parent_id?: number
+  mentioned_username?: string
 }
 
 export type ListCommentRequest = {
@@ -41,7 +42,9 @@ export type CommentResponse = {
     profilePicture?: string | null
     role: string
   }
-  replyToUser?: string | null
+  mention?: {
+    username: string
+  } | null
   likeCount: number
 }
 
@@ -99,20 +102,13 @@ export async function toCommentResponse(comment: Comment & { user: User & { role
     }
   })
 
-  const replyToUser = comment.parent_id
-    ? await prisma.comment
-        .findUnique({
-          where: { id: comment.parent_id, deleted: false },
-          select: {
-            user: {
-              select: {
-                username: true
-              }
-            }
-          }
-        })
-        .then((parentComment) => parentComment?.user?.username)
-    : null
+  const mention =
+    comment.mentioned_user_id &&
+    (await prisma.user.findFirst({
+      where: {
+        id: comment.mentioned_user_id ?? undefined
+      }
+    }))
 
   return {
     id: comment.id,
@@ -126,7 +122,7 @@ export async function toCommentResponse(comment: Comment & { user: User & { role
       profilePicture: comment.user.profile_picture ? `${process.env.BASE_URL}/${comment.user.profile_picture}` : null,
       role: comment.user.role.name
     },
-    replyToUser,
+    mention: mention ? { username: mention.username } : null,
     likeCount: likeCount
   }
 }

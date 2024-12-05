@@ -22,13 +22,22 @@ export class CommentService {
 
     const post = await this.postMustExists(request.post_id)
 
+    let mentionedUser = null
+
+    if (request.mentioned_username) {
+      mentionedUser = await prisma.user.findFirst({
+        where: { username: request.mentioned_username }
+      })
+    }
+
     // simpan comment ke database
     const comment = await prisma.comment.create({
       data: {
         content: request.content,
         post_id: post.id,
         user_id: user.id,
-        parent_id: request.parent_id
+        parent_id: request.parent_id,
+        mentioned_user_id: mentionedUser?.id
       },
       include: {
         user: {

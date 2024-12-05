@@ -4,7 +4,8 @@ export class CommentValidation {
   static readonly CREATE: ZodType = z.object({
     content: z.string().min(1),
     post_id: z.number().positive(),
-    parent_id: z.number().positive().optional()
+    parent_id: z.number().positive().optional(),
+    mentioned_username: z.string().min(1).optional()
   })
 
   static readonly GET: ZodType = z.object({

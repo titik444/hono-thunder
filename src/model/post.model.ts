@@ -43,6 +43,7 @@ export type PostResponse = {
     category: string
   }
   likeCount: number
+  commentCount: number
 }
 
 export type ListPostRequest = {
@@ -60,6 +61,14 @@ export async function toPostResponse(post: PostWithRelations): Promise<PostRespo
   const likeCount = await prisma.like.count({
     where: {
       post_id: post.id
+    }
+  })
+
+  // commentCount
+  const commentCount = await prisma.comment.count({
+    where: {
+      post_id: post.id,
+      deleted: false
     }
   })
 
@@ -81,6 +90,7 @@ export async function toPostResponse(post: PostWithRelations): Promise<PostRespo
       slug: post.room.slug,
       category: post.room.category.name
     },
-    likeCount: likeCount
+    likeCount: likeCount,
+    commentCount: commentCount
   }
 }

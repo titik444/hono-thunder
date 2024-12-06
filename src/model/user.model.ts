@@ -5,7 +5,8 @@ export type GetUserRequest = {
 }
 
 export type UpdateUserRequest = {
-  password?: string
+  old_password?: string
+  new_password?: string
   name?: string
   profile_picture?: string
 }
@@ -17,6 +18,8 @@ export type UserResponse = {
   name: string
   profilePicture?: string | null
   role: string
+  accessToken?: string
+  refreshToken?: string
 }
 
 export function toUserResponse(user: User & { role: { name: string } }): UserResponse {

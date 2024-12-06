@@ -30,7 +30,8 @@ userController.put(
     const formData = await c.req.formData()
 
     const request: UpdateUserRequest = {
-      password: formData.get('password')?.toString() || undefined,
+      old_password: formData.get('old_password')?.toString() || undefined,
+      new_password: formData.get('new_password')?.toString() || undefined,
       name: formData.get('name')?.toString() || undefined,
       profile_picture: c.get('uploadedFilePath') as unknown as string
     }

@@ -48,10 +48,10 @@ export class CommentService {
       }
     })
 
-    return toCommentResponse(comment)
+    return toCommentResponse(user, comment)
   }
 
-  static async list(request: ListCommentRequest): Promise<Pageable<CommentWithRepliesResponse>> {
+  static async list(user: User, request: ListCommentRequest): Promise<Pageable<CommentWithRepliesResponse>> {
     request = CommentValidation.LIST.parse(request)
 
     const post = await this.postMustExists(request.post_id)
@@ -94,7 +94,7 @@ export class CommentService {
     })
 
     return {
-      data: await Promise.all(comments.map((comment) => toCommentWithRepliesResponse(comment))),
+      data: await Promise.all(comments.map((comment) => toCommentWithRepliesResponse(user, comment))),
       pagination: {
         currentPage: request.page,
         perPage: request.per_page,
@@ -104,7 +104,7 @@ export class CommentService {
     }
   }
 
-  static async get(request: GetCommentRequest): Promise<CommentResponse> {
+  static async get(user: User, request: GetCommentRequest): Promise<CommentResponse> {
     request = CommentValidation.GET.parse(request)
 
     const comment = await prisma.comment.findFirst({
@@ -124,7 +124,7 @@ export class CommentService {
       })
     }
 
-    return toCommentResponse(comment)
+    return toCommentResponse(user, comment)
   }
 
   static async update(user: User, request: UpdateCommentRequest): Promise<CommentResponse> {
@@ -167,7 +167,7 @@ export class CommentService {
       }
     })
 
-    return toCommentResponse(updatedComment)
+    return toCommentResponse(user, updatedComment)
   }
 
   static async remove(user: User, request: RemoveCommentRequest): Promise<Boolean> {

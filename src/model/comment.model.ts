@@ -45,6 +45,7 @@ export type CommentResponse = {
   mention?: {
     username: string
   } | null
+  liked: boolean
   likeCount: number
 }
 
@@ -62,6 +63,7 @@ export type CommentWithRepliesResponse = {
   }
   parentId?: number | null
   replies: CommentResponse[]
+  liked: boolean
   likeCount: number
 }
 
@@ -70,7 +72,12 @@ export type CommentWithReplies = Comment & {
   replies?: CommentWithReplies[] | null
 } & { likeCount?: number }
 
-export async function toCommentWithRepliesResponse(comment: CommentWithReplies): Promise<CommentWithRepliesResponse> {
+export async function toCommentWithRepliesResponse(
+  user: User,
+  comment: CommentWithReplies
+): Promise<CommentWithRepliesResponse> {
+  const liked = user ? await prisma.like.findFirst({ where: { comment_id: comment.id, user_id: user.id } }) : false
+
   const likeCount = await prisma.like.count({
     where: {
       comment_id: comment.id
@@ -90,12 +97,18 @@ export async function toCommentWithRepliesResponse(comment: CommentWithReplies):
       role: comment.user.role.name
     },
     parentId: comment.parent_id,
-    replies: comment.replies ? await Promise.all(comment.replies.map((reply) => toCommentResponse(reply))) : [],
+    replies: comment.replies ? await Promise.all(comment.replies.map((reply) => toCommentResponse(user, reply))) : [],
+    liked: !!liked,
     likeCount: likeCount
   }
 }
 
-export async function toCommentResponse(comment: Comment & { user: User & { role: Role } }): Promise<CommentResponse> {
+export async function toCommentResponse(
+  user: User,
+  comment: Comment & { user: User & { role: Role } }
+): Promise<CommentResponse> {
+  const liked = user ? await prisma.like.findFirst({ where: { comment_id: comment.id, user_id: user.id } }) : false
+
   const likeCount = await prisma.like.count({
     where: {
       comment_id: comment.id
@@ -123,6 +136,7 @@ export async function toCommentResponse(comment: Comment & { user: User & { role
       role: comment.user.role.name
     },
     mention: mention ? { username: mention.username } : null,
+    liked: !!liked,
     likeCount: likeCount
   }
 }

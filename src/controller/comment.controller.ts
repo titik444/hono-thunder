@@ -9,18 +9,19 @@ import {
 } from '../model/comment.model'
 import { CommentService } from '../service/comment.service'
 import { response } from '../utils/response'
-import { authMiddleware } from '../middleware/auth.middleware'
+import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth.middleware'
 
 export const commentController = new Hono<{ Variables: ApplicationVariables }>()
 
-commentController.get('/post/:postId/comment', async (c) => {
+commentController.get('/post/:postId/comment', optionalAuthMiddleware, async (c) => {
+  const user = c.get('user') as User
   const request: ListCommentRequest = {
     post_id: Number(c.req.param('postId')),
     page: Number(c.req.query('page')) || 1,
     per_page: Number(c.req.query('per_page')) || 10
   }
 
-  const commentResponse = await CommentService.list(request)
+  const commentResponse = await CommentService.list(user, request)
 
   return response(c, 200, 'List comment success', commentResponse)
 })
@@ -37,7 +38,8 @@ commentController.post('/post/:postId/comment', authMiddleware, async (c) => {
   return response(c, 201, 'Create comment success', commentResponse)
 })
 
-commentController.get('/post/:postId/comment/:commentId', async (c) => {
+commentController.get('/post/:postId/comment/:commentId', optionalAuthMiddleware, async (c) => {
+  const user = c.get('user') as User
   const id = Number(c.req.param('commentId'))
   const postId = Number(c.req.param('postId'))
 
@@ -46,7 +48,7 @@ commentController.get('/post/:postId/comment/:commentId', async (c) => {
     id: id
   }
 
-  const commentResponse = await CommentService.get(request)
+  const commentResponse = await CommentService.get(user, request)
 
   return response(c, 200, 'Detail comment success', commentResponse)
 })

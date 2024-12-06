@@ -42,6 +42,8 @@ export type PostResponse = {
     slug: string
     category: string
   }
+  bookmarked: boolean
+  liked: boolean
   likeCount: number
   commentCount: number
 }
@@ -56,7 +58,10 @@ export type PostWithRelations = Post & { user: User & { role: Role } } & { room:
   likeCount?: number
 }
 
-export async function toPostResponse(post: PostWithRelations): Promise<PostResponse> {
+export async function toPostResponse(user: User, post: PostWithRelations): Promise<PostResponse> {
+  const liked = user ? await prisma.like.findFirst({ where: { post_id: post.id, user_id: user.id } }) : false
+  const bookmarked = user ? await prisma.bookmark.findFirst({ where: { post_id: post.id, user_id: user.id } }) : false
+
   // likeCount
   const likeCount = await prisma.like.count({
     where: {
@@ -90,6 +95,8 @@ export async function toPostResponse(post: PostWithRelations): Promise<PostRespo
       slug: post.room.slug,
       category: post.room.category.name
     },
+    bookmarked: !!bookmarked,
+    liked: !!liked,
     likeCount: likeCount,
     commentCount: commentCount
   }

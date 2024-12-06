@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { User } from '@prisma/client'
 import { ApplicationVariables } from '../model/app.model'
-import { authMiddleware } from '../middleware/auth.middleware'
+import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth.middleware'
 import { response } from '../utils/response'
 import {
   ListPostRequest,
@@ -15,14 +15,16 @@ import { uploadMiddleware } from '../middleware/upload.middleware'
 
 export const postController = new Hono<{ Variables: ApplicationVariables }>()
 
-postController.get('/room/:slug/post', async (c) => {
+postController.get('/room/:slug/post', optionalAuthMiddleware, async (c) => {
+  const user = c.get('user') as User
+
   const request: ListPostRequest = {
     slug: String(c.req.param('slug')),
     page: Number(c.req.query('page')) || 1,
     per_page: Number(c.req.query('per_page')) || 10
   }
 
-  const postResponse = await PostService.list(request)
+  const postResponse = await PostService.list(user, request)
 
   return response(c, 200, 'List post success', postResponse)
 })
@@ -58,7 +60,8 @@ postController.post(
   }
 )
 
-postController.get('/room/:slug/post/:postId', async (c) => {
+postController.get('/room/:slug/post/:postId', optionalAuthMiddleware, async (c) => {
+  const user = c.get('user') as User
   const slug = String(c.req.param('slug'))
   const postId = Number(c.req.param('postId'))
 
@@ -67,7 +70,7 @@ postController.get('/room/:slug/post/:postId', async (c) => {
     id: postId
   }
 
-  const postResponse = await PostService.get(request)
+  const postResponse = await PostService.get(user, request)
 
   return response(c, 200, 'Get post success', postResponse)
 })

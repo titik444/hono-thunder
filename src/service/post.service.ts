@@ -43,10 +43,10 @@ export class PostService {
       }
     })
 
-    return toPostResponse(post)
+    return toPostResponse(user, post)
   }
 
-  static async list(request: ListPostRequest): Promise<Pageable<PostResponse>> {
+  static async list(user: User, request: ListPostRequest): Promise<Pageable<PostResponse>> {
     request = PostValidation.LIST.parse(request)
 
     const room = await this.roomMustExists(request.slug)
@@ -88,7 +88,7 @@ export class PostService {
     })
 
     return {
-      data: await Promise.all(posts.map((post) => toPostResponse(post))),
+      data: await Promise.all(posts.map((post) => toPostResponse(user, post))),
       pagination: {
         currentPage: request.page,
         perPage: request.per_page,
@@ -98,7 +98,7 @@ export class PostService {
     }
   }
 
-  static async get(request: GetPostRequest): Promise<PostResponse> {
+  static async get(user: User, request: GetPostRequest): Promise<PostResponse> {
     request = PostValidation.GET.parse(request)
 
     const room = await this.roomMustExists(request.slug) // Validasi room
@@ -125,7 +125,7 @@ export class PostService {
       })
     }
 
-    return toPostResponse(post)
+    return toPostResponse(user, post)
   }
 
   static async update(user: User, request: UpdatePostRequest): Promise<PostResponse> {
@@ -191,7 +191,7 @@ export class PostService {
       }
     })
 
-    return toPostResponse(updatedPost)
+    return toPostResponse(user, updatedPost)
   }
 
   static async remove(user: User, request: RemovePostRequest): Promise<Boolean> {

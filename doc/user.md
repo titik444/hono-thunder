@@ -93,10 +93,9 @@ Request Body :
 
 ```json
 {
-  "username": "bob",
   "name": "Bob Brown",
   "password": "rahasia123",
-  "profilePicture": (file: avatar.jpg)
+  "profile_picture": (file: avatar.jpg)
 }
 ```
 

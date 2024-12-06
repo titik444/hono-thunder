@@ -5,7 +5,8 @@ export class UserValidation {
     username: z.string().min(1).max(100)
   })
   static readonly UPDATE: ZodType = z.object({
-    password: z.string().min(1).max(100).optional(),
+    old_password: z.string().min(1).max(100).optional(),
+    new_password: z.string().min(1).max(100).optional(),
     name: z.string().min(1).max(100).optional(),
     profile_picture: z.string().min(1).max(100).optional()
   })

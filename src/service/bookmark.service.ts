@@ -78,7 +78,7 @@ export class BookmarkService {
     }
   }
 
-  static async delete(user: User, postId: number): Promise<boolean> {
+  static async remove(user: User, postId: number): Promise<boolean> {
     postId = BookmarkValidation.REMOVE.parse(postId)
 
     await prisma.bookmark.deleteMany({

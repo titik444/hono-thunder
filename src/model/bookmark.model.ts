@@ -1,4 +1,4 @@
-import { Bookmark, Post, Role, Room, RoomCategory, User } from '@prisma/client'
+import { Post, Role, Room, RoomCategory, User } from '@prisma/client'
 
 export type CreateBookmarkRequest = {
   post_id: number

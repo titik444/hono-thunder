@@ -4,6 +4,11 @@ export type GetUserRequest = {
   username: string
 }
 
+export type ListUserRequest = {
+  page: number
+  per_page: number
+}
+
 export type UpdateUserRequest = {
   old_password?: string
   new_password?: string
@@ -20,6 +25,16 @@ export type UserResponse = {
   role: string
   accessToken?: string
   refreshToken?: string
+}
+
+export type ListUserResponse = {
+  data: UserResponse[]
+  pagination: {
+    currentPage: number
+    perPage: number
+    totalPages: number
+    totalItems: number
+  }
 }
 
 export function toUserResponse(user: User & { role: { name: string } }): UserResponse {

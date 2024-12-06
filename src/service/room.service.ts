@@ -1,9 +1,9 @@
 import { prisma } from '../utils/prisma'
-import { ListRoom, RoomResponse, toRoomResponse } from '../model/room.model'
+import { RoomChild, RoomChildResponse, toRoomChildResponse } from '../model/room.model'
 
 export class RoomService {
   // Fetch all rooms with their relationships
-  static async listWithChildren(): Promise<RoomResponse[]> {
+  static async listWithChildren(): Promise<RoomChildResponse[]> {
     const rooms = await prisma.room.findMany({
       include: { children: true, category: true }
     })
@@ -14,11 +14,11 @@ export class RoomService {
     return hierarchy
   }
 
-  private static buildRoomHierarchy(rooms: ListRoom[], parentId: number | null): RoomResponse[] {
-    const nodes: ListRoom[] = rooms.filter((room) => room.parent_id === parentId)
+  private static buildRoomHierarchy(rooms: RoomChild[], parentId: number | null): RoomChildResponse[] {
+    const nodes: RoomChild[] = rooms.filter((room) => room.parent_id === parentId)
 
-    return nodes.map((node: ListRoom) => ({
-      ...toRoomResponse(node),
+    return nodes.map((node: RoomChild) => ({
+      ...toRoomChildResponse(node),
       children: this.buildRoomHierarchy(rooms, node.id) // Recursive for child nodes
     }))
   }

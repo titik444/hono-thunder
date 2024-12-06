@@ -1,12 +1,11 @@
 import { Hono } from 'hono'
 import { response } from '../utils/response'
 import { UserService } from '../service/user.service'
-import { GetUserRequest, UpdateUserRequest } from '../model/user.model'
+import { GetUserRequest, ListUserRequest, UpdateUserRequest } from '../model/user.model'
 import { ApplicationVariables } from '../model/app.model'
 import { User } from '@prisma/client'
-import { authMiddleware } from '../middleware/auth.middleware'
+import { adminMiddleware, authMiddleware } from '../middleware/auth.middleware'
 import { uploadMiddleware } from '../middleware/upload.middleware'
-import { profile } from 'winston'
 
 export const userController = new Hono<{ Variables: ApplicationVariables }>()
 
@@ -41,3 +40,22 @@ userController.put(
     return response(c, 200, 'Update user success', userResponse)
   }
 )
+
+userController.get('/user', authMiddleware, adminMiddleware, async (c) => {
+  const request: ListUserRequest = {
+    page: Number(c.req.query('page')) || 1,
+    per_page: Number(c.req.query('per_page')) || 10
+  }
+
+  const userResponse = await UserService.list(request)
+
+  return response(c, 200, 'List user success', userResponse)
+})
+
+userController.delete('/user/:userId', authMiddleware, adminMiddleware, async (c) => {
+  const userId = Number(c.req.param('userId'))
+
+  const userResponse = await UserService.remove(userId)
+
+  return response(c, 200, 'Remove user success', userResponse)
+})

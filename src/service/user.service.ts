@@ -1,6 +1,13 @@
 import fs from 'fs'
 import { prisma } from '../utils/prisma'
-import { GetUserRequest, toUserResponse, UpdateUserRequest, UserResponse } from '../model/user.model'
+import {
+  GetUserRequest,
+  ListUserRequest,
+  ListUserResponse,
+  toUserResponse,
+  UpdateUserRequest,
+  UserResponse
+} from '../model/user.model'
 import { UserValidation } from '../validation/user.validation'
 import { HTTPException } from 'hono/http-exception'
 import { User } from '@prisma/client'
@@ -29,6 +36,39 @@ export class UserService {
     }
 
     return toUserResponse(user)
+  }
+
+  static async list(request: ListUserRequest): Promise<ListUserResponse> {
+    request = UserValidation.LIST.parse(request)
+
+    const skip = (request.page - 1) * request.per_page
+
+    const users = await prisma.user.findMany({
+      where: {
+        deleted: false
+      },
+      skip,
+      take: request.per_page,
+      include: {
+        role: true
+      }
+    })
+
+    const total = await prisma.user.count({
+      where: {
+        deleted: false
+      }
+    })
+
+    return {
+      data: users.map(toUserResponse),
+      pagination: {
+        currentPage: request.page,
+        perPage: request.per_page,
+        totalPages: Math.ceil(total / request.per_page),
+        totalItems: total
+      }
+    }
   }
 
   static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
@@ -96,6 +136,29 @@ export class UserService {
 
     // update generate token
     return this.generateAuthResponse(updatedUser)
+  }
+
+  static async remove(userId: number): Promise<Boolean> {
+    userId = UserValidation.REMOVE.parse(userId)
+
+    const user = await prisma.user.findFirst({
+      where: { id: userId, deleted: false }
+    })
+
+    if (!user) {
+      throw new HTTPException(404, {
+        message: 'User not found'
+      })
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        deleted: true
+      }
+    })
+
+    return true
   }
 
   private static async generateAuthResponse(user: User): Promise<UserResponse> {

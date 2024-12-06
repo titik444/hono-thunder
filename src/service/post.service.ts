@@ -83,7 +83,8 @@ export class PostService {
       where: {
         room: {
           id: room.id
-        }
+        },
+        deleted: false
       }
     })
 

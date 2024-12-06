@@ -38,7 +38,7 @@ bookmarkController.delete('/post/:postId/bookmark', authMiddleware, async (c) =>
 
   const postId = Number(c.req.param('postId'))
 
-  const bookmarkResponse = await BookmarkService.delete(user, postId)
+  const bookmarkResponse = await BookmarkService.remove(user, postId)
 
   return response(c, 200, 'Remove bookmark success', bookmarkResponse)
 })

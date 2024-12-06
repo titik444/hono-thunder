@@ -1,17 +1,17 @@
 import { Room, RoomCategory } from '@prisma/client'
 
-export type RoomResponse = {
+export type RoomChildResponse = {
   id: number
   name: string
   slug: string
   parentId: number | null
   category: string
-  children?: RoomResponse[]
+  children?: RoomChildResponse[]
 }
 
-export type ListRoom = Room & { category: RoomCategory }
+export type RoomChild = Room & { category: RoomCategory }
 
-export function toRoomResponse(room: ListRoom): RoomResponse {
+export function toRoomChildResponse(room: RoomChild): RoomChildResponse {
   return {
     id: room.id,
     name: room.name,

@@ -6,6 +6,7 @@ import { postController } from './controller/post.controller'
 import { commentController } from './controller/comment.controller'
 import { likeController } from './controller/like.controller'
 import { bookmarkController } from './controller/bookmark.controller'
+import { userController } from './controller/user.controller'
 
 export const routes = (app: Hono) => {
   app.get('/health', async (c) => {
@@ -27,4 +28,5 @@ export const routes = (app: Hono) => {
   app.route('/api', commentController)
   app.route('/api', likeController)
   app.route('/api', bookmarkController)
+  app.route('/api', userController)
 }

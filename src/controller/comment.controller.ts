@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { ApplicationVariables } from '../model/app.model'
-import { User } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 import {
   CreateCommentRequest,
   GetCommentRequest,
@@ -70,7 +70,7 @@ commentController.put('/post/:postId/comment/:commentId', authMiddleware, async 
 })
 
 commentController.delete('/post/:postId/comment/:commentId', authMiddleware, async (c) => {
-  const user = c.get('user') as User
+  const user = c.get('user') as User & { role: Role }
   const postId = Number(c.req.param('postId'))
   const id = Number(c.req.param('commentId'))
 

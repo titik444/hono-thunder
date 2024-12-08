@@ -41,13 +41,19 @@ export class UserService {
   static async list(request: ListUserRequest): Promise<ListUserResponse> {
     request = UserValidation.LIST.parse(request)
 
-    const skip = (request.page - 1) * request.per_page
-
     const users = await prisma.user.findMany({
-      where: {
-        deleted: false
+      orderBy: {
+        id: 'desc'
       },
-      skip,
+      where: {
+        deleted: false,
+        NOT: {
+          role: {
+            name: 'Admin'
+          }
+        }
+      },
+      skip: (request.page - 1) * request.per_page,
       take: request.per_page,
       include: {
         role: true
@@ -73,6 +79,13 @@ export class UserService {
 
   static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
     request = UserValidation.UPDATE.parse(request)
+
+    // check owner
+    if (user.username !== request.username) {
+      throw new HTTPException(403, {
+        message: 'You are not allowed to update this user'
+      })
+    }
 
     // update password
     if (request.old_password || request.new_password) {

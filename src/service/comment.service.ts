@@ -1,4 +1,4 @@
-import { Post, User } from '@prisma/client'
+import { Post, Role, User } from '@prisma/client'
 import {
   CommentResponse,
   CommentWithRepliesResponse,
@@ -56,8 +56,6 @@ export class CommentService {
 
     const post = await this.postMustExists(request.post_id)
 
-    const skip = (request.page - 1) * request.per_page
-
     const comments = await prisma.comment.findMany({
       where: {
         post_id: post.id,
@@ -82,7 +80,7 @@ export class CommentService {
         }
       },
       take: request.per_page,
-      skip: skip
+      skip: (request.page - 1) * request.per_page
     })
 
     const total = await prisma.comment.count({
@@ -170,15 +168,20 @@ export class CommentService {
     return toCommentResponse(user, updatedComment)
   }
 
-  static async remove(user: User, request: RemoveCommentRequest): Promise<Boolean> {
+  static async remove(user: User & { role: Role }, request: RemoveCommentRequest): Promise<Boolean> {
     request = CommentValidation.REMOVE.parse(request)
 
     const comment = await prisma.comment.findFirst({
-      where: { id: request.id, post_id: request.post_id, user_id: user.id, deleted: false },
+      where: { id: request.id, post_id: request.post_id, deleted: false },
       include: {
         user: {
           include: {
             role: true
+          }
+        },
+        post: {
+          include: {
+            user: true
           }
         }
       }
@@ -190,7 +193,8 @@ export class CommentService {
       })
     }
 
-    if (comment.user_id !== user.id) {
+    // user must be owner or admin or owner of post
+    if (comment.user_id !== user.id && user.role.name.toLowerCase() !== 'admin' && comment.post.user_id !== user.id) {
       throw new HTTPException(403, {
         message: 'You are not authorized to remove this comment'
       })

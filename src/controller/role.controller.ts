@@ -26,6 +26,14 @@ roleController.post('/role', authMiddleware, adminMiddleware, async (c) => {
   return response(c, 201, 'Create role success', roleResponse)
 })
 
+roleController.get('/role/:roleId', authMiddleware, adminMiddleware, async (c) => {
+  const roleId = Number(c.req.param('roleId'))
+
+  const roleResponse = await RoleService.get(roleId)
+
+  return response(c, 200, 'Get role success', roleResponse)
+})
+
 roleController.put('/role/:roleId', authMiddleware, adminMiddleware, async (c) => {
   const roleId = Number(c.req.param('roleId'))
   const request = {

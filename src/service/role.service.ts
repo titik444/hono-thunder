@@ -25,14 +25,12 @@ export class RoleService {
   static async list(request: ListRoleRequest): Promise<ListRoleResponse> {
     request = RoleValidation.LIST.parse(request)
 
-    const skip = (request.page - 1) * request.per_page
-
     const roles = await prisma.role.findMany({
       where: {
         deleted: false
       },
       take: request.per_page,
-      skip: skip
+      skip: (request.page - 1) * request.per_page
     })
 
     const total = await prisma.role.count({
@@ -50,6 +48,20 @@ export class RoleService {
         totalItems: total
       }
     }
+  }
+
+  static async get(roleId: number): Promise<RoleResponse> {
+    roleId = RoleValidation.GET.parse(roleId)
+
+    const role = await prisma.role.findFirst({
+      where: { id: roleId, deleted: false }
+    })
+
+    if (!role) {
+      throw new Error('Role not found')
+    }
+
+    return toRoleResponse(role)
   }
 
   static async update(request: UpdateRoleRequest): Promise<RoleResponse> {

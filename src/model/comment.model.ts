@@ -96,7 +96,7 @@ export async function toCommentWithRepliesResponse(
       profilePicture: comment.user.profile_picture ? `${process.env.BASE_URL}/${comment.user.profile_picture}` : null,
       role: comment.user.role.name
     },
-    parentId: comment.parent_id,
+    parentId: comment.parent_id ?? undefined,
     replies: comment.replies ? await Promise.all(comment.replies.map((reply) => toCommentResponse(user, reply))) : [],
     liked: !!liked,
     likeCount: likeCount

@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { User } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 import { ApplicationVariables } from '../model/app.model'
 import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth.middleware'
 import { response } from '../utils/response'
@@ -101,7 +101,7 @@ postController.put(
 )
 
 postController.delete('/room/:slug/post/:postId', authMiddleware, async (c) => {
-  const user = c.get('user') as User
+  const user = c.get('user') as User & { role: Role }
   const slug = String(c.req.param('slug'))
   const postId = Number(c.req.param('postId'))
 

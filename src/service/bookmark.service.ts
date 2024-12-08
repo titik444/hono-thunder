@@ -35,8 +35,6 @@ export class BookmarkService {
   static async list(user: User, request: ListBookmarkRequest): Promise<Pageable<ListBookmarkResponse>> {
     request = BookmarkValidation.LIST.parse(request)
 
-    const skip = (request.page - 1) * request.per_page
-
     const bookmarks = await prisma.bookmark.findMany({
       where: {
         user_id: user.id
@@ -58,7 +56,7 @@ export class BookmarkService {
         }
       },
       take: request.per_page,
-      skip: skip
+      skip: (request.page - 1) * request.per_page
     })
 
     const total = await prisma.bookmark.count({

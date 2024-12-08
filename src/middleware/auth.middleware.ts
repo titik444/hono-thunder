@@ -31,7 +31,7 @@ export const optionalAuthMiddleware: MiddlewareHandler = async (c, next) => {
 export const adminMiddleware: MiddlewareHandler = async (c, next) => {
   const user = c.get('user')
 
-  if (!user || user.role !== 'admin') {
+  if (!user || user.role.name.toLowerCase() !== 'admin') {
     throw new HTTPException(403, { message: 'You are not authorized to access this resource' })
   }
 

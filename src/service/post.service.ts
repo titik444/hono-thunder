@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { prisma } from '../utils/prisma'
-import { Room, User } from '@prisma/client'
+import { Role, Room, User } from '@prisma/client'
 import { HTTPException } from 'hono/http-exception'
 import { PostValidation } from '../validation/post.validation'
 import {
@@ -51,8 +51,6 @@ export class PostService {
 
     const room = await this.roomMustExists(request.slug)
 
-    const skip = (request.page - 1) * request.per_page
-
     const posts = await prisma.post.findMany({
       orderBy: {
         id: 'desc'
@@ -76,7 +74,7 @@ export class PostService {
         }
       },
       take: request.per_page,
-      skip: skip
+      skip: (request.page - 1) * request.per_page
     })
 
     const total = await prisma.post.count({
@@ -195,7 +193,7 @@ export class PostService {
     return toPostResponse(user, updatedPost)
   }
 
-  static async remove(user: User, request: RemovePostRequest): Promise<Boolean> {
+  static async remove(user: User & { role: Role }, request: RemovePostRequest): Promise<Boolean> {
     request = PostValidation.REMOVE.parse(request)
 
     const room = await this.roomMustExists(request.slug) // Validasi room
@@ -222,7 +220,8 @@ export class PostService {
       })
     }
 
-    if (post.user_id !== user.id) {
+    // user must be owner or admin or owner of room
+    if (post.user_id !== user.id && user.role.name.toLowerCase() !== 'admin') {
       throw new HTTPException(403, {
         message: 'You are not authorized to remove this post'
       })

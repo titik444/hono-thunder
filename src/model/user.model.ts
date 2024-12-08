@@ -10,6 +10,7 @@ export type ListUserRequest = {
 }
 
 export type UpdateUserRequest = {
+  username: string
   old_password?: string
   new_password?: string
   name?: string

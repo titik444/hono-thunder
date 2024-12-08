@@ -9,10 +9,6 @@ export type ListRoleRequest = {
   per_page: number
 }
 
-export type GetRoleRequest = {
-  id: number
-}
-
 export type UpdateRoleRequest = {
   id: number
   name: string

@@ -29,16 +29,14 @@ export class RoomService {
   static async create(request: CreateRoomRequest): Promise<RoomResponse> {
     request = RoomValidation.CREATE.parse(request)
 
+    let slug = slugify(request.name).toLowerCase()
+
     const slugExists = await prisma.room.findFirst({
-      where: { slug: slugify(request.name) }
+      where: { slug: slug }
     })
 
-    let slug
-
     if (slugExists) {
-      slug = slugify(`${request.name}-${Math.floor(Math.random() * 1000)}`)
-    } else {
-      slug = slugify(request.name)
+      slug = `${slug}-${Math.floor(Math.random() * 1000)}`
     }
 
     const room = await prisma.room.create({
@@ -115,10 +113,21 @@ export class RoomService {
       throw new Error('Room not found')
     }
 
+    let slug = slugify(request.name).toLowerCase()
+
+    const slugExists = await prisma.room.findFirst({
+      where: { slug: slug, id: { not: request.id } }
+    })
+
+    if (slugExists) {
+      slug = `${slug}-${Math.floor(Math.random() * 1000)}`
+    }
+
     const updatedRoom = await prisma.room.update({
       where: { id: request.id },
       data: {
         name: request.name,
+        slug: slug,
         parent_id: request.parent_id ?? null,
         category_id: request.category_id
       },

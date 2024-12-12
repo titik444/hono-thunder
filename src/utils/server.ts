@@ -5,9 +5,13 @@ import { ZodError } from 'zod'
 import { logger } from './logging'
 import { routes } from '../routes'
 import { apiKeyAuth } from '../middleware/api-key.middleware'
+import { cors } from 'hono/cors'
 
 const createServer = () => {
   const app = new Hono()
+
+  // Enable CORS
+  app.use(cors())
 
   // Serve static files
   app.use('*', serveStatic({ root: './public' }))
